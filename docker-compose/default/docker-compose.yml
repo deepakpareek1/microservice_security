@@ -1,4 +1,17 @@
 services:
+ keycloak:
+  image: quay.io/keycloak/keycloak:25.0.1
+  container_name: keycloak
+  ports:
+   - "7080:8080"
+  environment:
+   KEYCLOAK_ADMIN: "admin"
+   KEYCLOAK_ADMIN_PASSWORD: "admin"
+  command: "start-dev"
+  extends:
+   file: common-config.yml
+   service: network-deploy-service
+    
  read:
   image: grafana/loki:3.0.0
   command: "-config.file=/etc/loki/config.yaml -target=read"
@@ -217,7 +230,7 @@ services:
    
          
  configserver:
-  image: "deepakpareek1/configserver:s3"
+  image: "deepakpareek1/configserver:s4"
   container_name: configserver-ms
   ports:
    - "8071:8071"
@@ -234,7 +247,7 @@ services:
    OTEL_SERVICE_NAME: "configserver"
  
  eurekaserver:
-  image: "deepakpareek1/eurekaserver:s3"
+  image: "deepakpareek1/eurekaserver:s4"
   container_name: eurekaserver-ms
   ports:
    - "8070:8070"
@@ -255,7 +268,7 @@ services:
    OTEL_SERVICE_NAME: "eurekaserver"
      
  accounts:
-  image: "deepakpareek1/accounts:s3"
+  image: "deepakpareek1/accounts:s4"
   container_name: accounts-ms
   ports:
    - "8080:8080"
@@ -278,7 +291,7 @@ services:
    service: microservice-eurekaserver-config
    
  loans:
-  image: "deepakpareek1/loans:s3"
+  image: "deepakpareek1/loans:s4"
   container_name: loans-ms
   ports:
    - "8090:8090"
@@ -301,7 +314,7 @@ services:
    service: microservice-eurekaserver-config
    
  cards:
-  image: "deepakpareek1/cards:s3"
+  image: "deepakpareek1/cards:s4"
   container_name: cards-ms
   ports:
    - "9000:9000"
@@ -324,7 +337,7 @@ services:
    service: microservice-eurekaserver-config
    
  gatewayserver:
-  image: "deepakpareek1/gatewayserver:s3"
+  image: "deepakpareek1/gatewayserver:s4"
   container_name: gatewayserver-ms
   ports:
    - "8072:8072"
@@ -338,6 +351,7 @@ services:
   environment:
    SPRING_APPLICATION_NAME: gatewayserver
    OTEL_SERVICE_NAME: "gatewayserver"
+   SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK-SET-URI: "http://keycloak:8080/realms/master/protocol/openid-connect/certs"
   extends:
    file: common-config.yml
    service: microservice-eurekaserver-config
